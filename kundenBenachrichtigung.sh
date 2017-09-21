@@ -123,14 +123,14 @@ for kunden_domain in $domains ; do
 				# prüfe ob 24 stunden schon rum sind und wir ne neue mail schicken können
 				if [ checkIfFileIsOldEnough $kunden_domain.blacklisted = "true" ] ; then
 			
-					sendMail $result $kunden_domain $addresse
+					sendMailBlacklisted $result $kunden_domain $addresse
 			
 				fi
 				
 			fi
 		else
-		
-			sendMail $result $kunden_domain $addresse
+			
+			sendMailBlacklisted $result $kunden_domain $addresse
 			
 		
 		fi
