@@ -114,7 +114,7 @@ for kunden_domain in $domains ; do
 			# prüfe ob inhalt der Datei != result aka es hat sich am Status etwas geändert
 			if [ $(cat $kunden_domain.blacklisted) != $result] ; then
 				
-				sendMailUpdates $result $kunden_domain $addresse
+				sendMailUpdates $result $addresse $kunden_domain
 				
 				# Schreibe neuen Status
 				echo $result > $kunden_domain.blacklisted
@@ -123,14 +123,14 @@ for kunden_domain in $domains ; do
 				# prüfe ob 24 stunden schon rum sind und wir ne neue mail schicken können
 				if [ checkIfFileIsOldEnough $kunden_domain.blacklisted = "true" ] ; then
 			
-					sendMailBlacklisted $result $kunden_domain $addresse
+					sendMailBlacklisted $result $addresse $kunden_domain
 			
 				fi
 				
 			fi
 		else
 			
-			sendMailBlacklisted $result $kunden_domain $addresse
+			sendMailBlacklisted $result $addresse $kunden_domain
 			
 		
 		fi
@@ -142,7 +142,7 @@ for kunden_domain in $domains ; do
 		# prüfen ob jetzt noch ein Status vorliegt, wenn ja mail rausschicken und status löschen
 		if [ -f $kunden_domain.blacklisted ] ; then
 			$result=$($kunden_domain.blacklisted)
-			sendMailBlacklistFree $result $kunden_domain $addresse
+			sendMailBlacklistFree $result $addresse $kunden_domain
 			rm $kunden_domain.blacklisted
 		fi
 
