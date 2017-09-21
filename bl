@@ -62,14 +62,14 @@ loopthroughblacklists() {
 
         if [[ $listed == *"timed out"* ]]; then
 
-          echo "[timed out]" | cecho YELLOW 
+          echo "[timed out]"
         else
         
-          echo "[blacklisted] (${listed})" | cecho LRED
+          echo "[blacklisted] (${listed})"
         fi
       else
 
-          echo "[not listed]" | cecho LGREEN
+          echo "[not listed]"
       fi
   done
 }
