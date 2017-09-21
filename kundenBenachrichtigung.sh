@@ -3,13 +3,13 @@
 
 ### Get Address for domain $1 = domain ###
 getAddress(){
-	cat /mnt/d/domains2.csv | grep $1 | cut -d ';' -f2
+	cat domains.csv | grep $1 | cut -d ';' -f2
 }
 
 ### Sende Mail zum Kunden 
 ### $1 = result aus blacklist check, $2 = adresse, $3 = domain
 sendMailBlacklisted(){
-
+echo "fange an mail raus zu senden"
 echo "Lieber Kunde, 
 
 	wir haben folgende Domain auf mindestens einer Blacklist gefunden.
@@ -18,7 +18,7 @@ echo "Lieber Kunde,
 	
 	Betroffene Domain: '$3'
 	Blacklists:
-	$1
+	'$1'
 	
 	Mit freundlichen Grüßen
 	
@@ -41,7 +41,7 @@ echo "Lieber Kunde,
 	
 	Betroffene Domain: '$3'
 	Blacklists:
-	$1
+	'$1'
 	
 	Mit freundlichen Grüßen
 	
@@ -62,7 +62,7 @@ echo "Lieber Kunde,
 	Betroffene Domain: '$3'
 	
 	Blacklists:
-	$1
+	'$1'
 	
 	Mit freundlichen Grüßen
 	
@@ -92,7 +92,7 @@ fi
 
 
 # hole Domains aus CSV
-domains=$(csvtool -t ";" col 1 /mnt/d/domains.csv) 
+domains=$(csvtool -t ";" col 1 domains.csv) 
 
 
 # iteriere durch sie durch
@@ -105,7 +105,7 @@ for kunden_domain in $domains ; do
 		# IP wurde gefunden, lol
 	
 		# hole zugehörige addresse
-		adresse=$(getAddress $kunden_domain)
+		addresse=$(getAddress $kunden_domain)
 		
 		# prüfe ob es schon einen Status zu der Domain gibt
 		# Merke: Es wird erst ein Status gespeichert wenn ein Vorfall vorliegt
@@ -113,8 +113,8 @@ for kunden_domain in $domains ; do
 		
 			# prüfe ob inhalt der Datei != result aka es hat sich am Status etwas geändert
 			if [ $(cat $kunden_domain.blacklisted) != $result] ; then
-				
-				sendMailUpdates $result $addresse $kunden_domain
+				echo "Sende Update raus"
+				sendMailUpdates "$result" "$addresse" "$kunden_domain"
 				
 				# Schreibe neuen Status
 				echo $result > $kunden_domain.blacklisted
@@ -122,16 +122,16 @@ for kunden_domain in $domains ; do
 				
 				# prüfe ob 24 stunden schon rum sind und wir ne neue mail schicken können
 				if [ checkIfFileIsOldEnough $kunden_domain.blacklisted = "true" ] ; then
-			
-					sendMailBlacklisted $result $addresse $kunden_domain
+					echo "Sende Mail raus and $addresse an "$addresse""
+					sendMailBlacklisted "$result" "$addresse" "$kunden_domain"
 			
 				fi
 				
 			fi
 		else
-			
-			sendMailBlacklisted $result $addresse $kunden_domain
-			
+			echo "Sende mail raus an $addresse"
+			sendMailBlacklisted "$result" "$addresse" "$kunden_domain"
+			echo $result > $kunden_domain.blacklisted
 		
 		fi
 		
@@ -142,7 +142,8 @@ for kunden_domain in $domains ; do
 		# prüfen ob jetzt noch ein Status vorliegt, wenn ja mail rausschicken und status löschen
 		if [ -f $kunden_domain.blacklisted ] ; then
 			$result=$($kunden_domain.blacklisted)
-			sendMailBlacklistFree $result $addresse $kunden_domain
+			echo "Sende Mail raus"
+			sendMailBlacklistFree "$result" "$addresse" "$kunden_domain"
 			rm $kunden_domain.blacklisted
 		fi
 
