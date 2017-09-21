@@ -20,10 +20,6 @@ echo "Lieber Kunde,
 	Blacklists:
 	'$1'
 	
-	Mit freundlichen Grüßen
-	
-	
-	
 	" | mail -s "Domain: '$3' auf Blacklist gefunden" $2
 
 }
@@ -43,10 +39,6 @@ echo "Lieber Kunde,
 	Blacklists:
 	'$1'
 	
-	Mit freundlichen Grüßen
-	
-	
-	
 	" | mail -s "UPDATE: Domain: '$3' auf Blacklist gefunden" $2
 
 }
@@ -63,10 +55,6 @@ echo "Lieber Kunde,
 	
 	Blacklists:
 	'$1'
-	
-	Mit freundlichen Grüßen
-	
-	
 	
 	" | mail -s "UPDATE: Domain: '$3' von Blacklist entfernt" $2
 }
