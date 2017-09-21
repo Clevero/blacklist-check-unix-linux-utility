@@ -3,7 +3,7 @@
 
 ### Get Address for domain $1 = domain ###
 getAddress(){
-	cat /mnt/d/domains.csv | grep $1 | cut -d ';' -f2
+	cat /mnt/d/domains2.csv | grep $1 | cut -d ';' -f2
 }
 
 ### Sende Mail zum Kunden 
@@ -49,6 +49,26 @@ echo "Lieber Kunde,
 	
 	" | mail -s "UPDATE: Domain: '$3' auf Blacklist gefunden" $2
 
+}
+
+### Sendet eine Mail raus, dass die Domain
+### $1 = result aus blacklist check, $2 = adresse, $3 = domain
+sendMailBlacklistFree(){
+echo "Lieber Kunde, 
+
+	folgende Domain ist nichtmehr auf einer Blacklist. Hurray!
+	
+	
+	Betroffene Domain: '$3'
+	
+	Blacklists:
+	$1
+	
+	Mit freundlichen Grüßen
+	
+	
+	
+	" | mail -s "UPDATE: Domain: '$3' von Blacklist entfernt" $2
 }
 
 ### Prüft ob die Datei vor mindestens 24 Stunden verändert wurde
@@ -118,6 +138,13 @@ for kunden_domain in $domains ; do
 	else
 	
 		echo "Für Kunden Domain: $kunden_domain nichts gefunden"
+		
+		# prüfen ob jetzt noch ein Status vorliegt, wenn ja mail rausschicken und status löschen
+		if [ -f $kunden_domain.blacklisted ] ; then
+			$result=$($kunden_domain.blacklisted)
+			sendMailBlacklistFree $result $kunden_domain $addresse
+			rm $kunden_domain.blacklisted
+		fi
 
 	fi
 
