@@ -118,10 +118,6 @@ blacklists="
   multi.surbl.org
   uribl.swinog.ch
   dob.sibl.support-intelligence.net
-  black.uribl.com
-  grey.uribl.com
-  multi.uribl.com
-  red.uribl.com
   uri.blacklist.woody.ch
   rhsbl.zapbl.net
   hostkarma.junkemailfilter.com
