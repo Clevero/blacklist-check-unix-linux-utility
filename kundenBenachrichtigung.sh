@@ -13,7 +13,7 @@ log(){
 
 currentDate=$(date)
 
-echo "$currentDate :  $1" >> $logPath$2.log
+echo "$currentDate:  $1" >> "$logPath""$2".log
 
 echo 
 
@@ -97,7 +97,7 @@ fi
 
 
 #script was started at
-scriptStartedAt=$(date)
+scriptStartedAt=$(date +"%Y-%m-%d_%H-%M-%S")
 
 # hole Domains aus CSV
 domains=$(csvtool -t ";" col 1 $domainsCsvPath) 
@@ -141,7 +141,7 @@ for kunden_domain in $domains ; do
 		fi
 		
 	else
-		log "Für Domain $kunden_domain nichts gefunden" $scriptStartedAt
+		log "Für Domain $kunden_domain nichts gefunden" "$scriptStartedAt"
 		# prüfen ob jetzt noch ein Status vorliegt, wenn ja mail rausschicken und status löschen
 		if [ -f $blacklistedFilesPath$kunden_domain.blacklisted ] ; then
 			$result=$(cat $blacklistedFilesPath$kunden_domain.blacklisted)
