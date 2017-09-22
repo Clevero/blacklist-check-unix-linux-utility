@@ -1,9 +1,14 @@
 #!/bin/bash
 
+############
+###CONFIG###
+############
+domainsCsvPath="domains.csv"
+blacklistedFilesPath="blacklisted/"
 
 ### Get Address for domain $1 = domain ###
 getAddress(){
-	cat domains.csv | grep $1 | cut -d ';' -f2
+	cat $domainsCsvPath | grep $1 | cut -d ';' -f2
 }
 
 ### Sende Mail zum Kunden 
@@ -80,7 +85,7 @@ fi
 
 
 # hole Domains aus CSV
-domains=$(csvtool -t ";" col 1 domains.csv) 
+domains=$(csvtool -t ";" col 1 $domainsCsvPath) 
 
 
 # iteriere durch sie durch
@@ -97,19 +102,19 @@ for kunden_domain in $domains ; do
 		
 		# prüfe ob es schon einen Status zu der Domain gibt
 		# Merke: Es wird erst ein Status gespeichert wenn ein Vorfall vorliegt
-		if [ -f $kunden_domain.blacklisted ] ; then
+		if [ -f $blacklistedFilesPath$kunden_domain.blacklisted ] ; then
 		
 			# prüfe ob inhalt der Datei != result aka es hat sich am Status etwas geändert
-			if [ $(cat $kunden_domain.blacklisted) != $result] ; then
+			if [ $(cat $blacklistedFilesPath$kunden_domain.blacklisted) != $result] ; then
 				echo "Sende Update raus"
 				sendMailUpdates "$result" "$addresse" "$kunden_domain"
 				
 				# Schreibe neuen Status
-				echo $result > $kunden_domain.blacklisted
+				echo $result > $blacklistedFilesPath$kunden_domain.blacklisted
 			else
 				
 				# prüfe ob 24 stunden schon rum sind und wir ne neue mail schicken können
-				if [ checkIfFileIsOldEnough $kunden_domain.blacklisted = "true" ] ; then
+				if [ checkIfFileIsOldEnough $blacklistedFilesPath$kunden_domain.blacklisted = "true" ] ; then
 					echo "Sende Mail raus and $addresse an "$addresse""
 					sendMailBlacklisted "$result" "$addresse" "$kunden_domain"
 			
@@ -119,7 +124,7 @@ for kunden_domain in $domains ; do
 		else
 			echo "Sende mail raus an $addresse"
 			sendMailBlacklisted "$result" "$addresse" "$kunden_domain"
-			echo $result > $kunden_domain.blacklisted
+			echo $result > $blacklistedFilesPath$kunden_domain.blacklisted
 		
 		fi
 		
@@ -128,11 +133,11 @@ for kunden_domain in $domains ; do
 		echo "Für Kunden Domain: $kunden_domain nichts gefunden"
 		
 		# prüfen ob jetzt noch ein Status vorliegt, wenn ja mail rausschicken und status löschen
-		if [ -f $kunden_domain.blacklisted ] ; then
-			$result=$($kunden_domain.blacklisted)
+		if [ -f $blacklistedFilesPath$kunden_domain.blacklisted ] ; then
+			$result=$(cat $blacklistedFilesPath$kunden_domain.blacklisted)
 			echo "Sende Mail raus"
 			sendMailBlacklistFree "$result" "$addresse" "$kunden_domain"
-			rm $kunden_domain.blacklisted
+			rm $blacklistedFilesPath$kunden_domain.blacklisted
 		fi
 
 	fi
