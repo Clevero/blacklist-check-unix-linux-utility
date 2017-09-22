@@ -5,6 +5,19 @@
 ############
 domainsCsvPath="domains.csv"
 blacklistedFilesPath="blacklisted/"
+logPath="logs/"
+
+###log
+### $1=logString, $2 = date where script was started/path of log file 
+log(){
+
+currentDate=$(date)
+
+echo "$currentDate :  $1" >> $logPath$2.log
+
+echo 
+
+}
 
 ### Get Address for domain $1 = domain ###
 getAddress(){
@@ -14,7 +27,6 @@ getAddress(){
 ### Sende Mail zum Kunden 
 ### $1 = result aus blacklist check, $2 = adresse, $3 = domain
 sendMailBlacklisted(){
-echo "fange an mail raus zu senden"
 echo "Lieber Kunde, 
 
 	wir haben folgende Domain auf mindestens einer Blacklist gefunden.
@@ -84,6 +96,9 @@ fi
 }
 
 
+#script was started at
+scriptStartedAt=$(date)
+
 # hole Domains aus CSV
 domains=$(csvtool -t ";" col 1 $domainsCsvPath) 
 
@@ -106,7 +121,6 @@ for kunden_domain in $domains ; do
 		
 			# prüfe ob inhalt der Datei != result aka es hat sich am Status etwas geändert
 			if [ $(cat $blacklistedFilesPath$kunden_domain.blacklisted) != $result] ; then
-				echo "Sende Update raus"
 				sendMailUpdates "$result" "$addresse" "$kunden_domain"
 				
 				# Schreibe neuen Status
@@ -115,27 +129,22 @@ for kunden_domain in $domains ; do
 				
 				# prüfe ob 24 stunden schon rum sind und wir ne neue mail schicken können
 				if [ checkIfFileIsOldEnough $blacklistedFilesPath$kunden_domain.blacklisted = "true" ] ; then
-					echo "Sende Mail raus and $addresse an "$addresse""
 					sendMailBlacklisted "$result" "$addresse" "$kunden_domain"
 			
 				fi
 				
 			fi
 		else
-			echo "Sende mail raus an $addresse"
 			sendMailBlacklisted "$result" "$addresse" "$kunden_domain"
 			echo $result > $blacklistedFilesPath$kunden_domain.blacklisted
 		
 		fi
 		
 	else
-	
-		echo "Für Kunden Domain: $kunden_domain nichts gefunden"
-		
+		log "Für Domain $kunden_domain nichts gefunden" $scriptStartedAt
 		# prüfen ob jetzt noch ein Status vorliegt, wenn ja mail rausschicken und status löschen
 		if [ -f $blacklistedFilesPath$kunden_domain.blacklisted ] ; then
 			$result=$(cat $blacklistedFilesPath$kunden_domain.blacklisted)
-			echo "Sende Mail raus"
 			sendMailBlacklistFree "$result" "$addresse" "$kunden_domain"
 			rm $blacklistedFilesPath$kunden_domain.blacklisted
 		fi
