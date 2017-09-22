@@ -126,7 +126,6 @@ blacklists="
   nobl.junkemailfilter.com
   iddb.isipp.com
   _vouch.dwl.spamhaus.org
-  white.uribl.com
   list.anonwhois.net"
 ### initiate script ###
 main $1
